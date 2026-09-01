@@ -1,0 +1,3070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Syed Meesam Abbas | 3D Creative Portfolio</title>
+
+  <meta
+    name="description"
+    content="Syed Meesam Abbas - Digital growth, website development, creative production, paid advertising and AI workflow portfolio."
+  />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: #030303;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: #ff5a00;
+      color: #ffffff;
+    }
+
+    /* ===============================
+       CUSTOM CURSOR
+    =============================== */
+
+    .cursor {
+      position: fixed;
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(255, 125, 35, 0.9);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition:
+        width 0.2s ease,
+        height 0.2s ease,
+        background 0.2s ease;
+      mix-blend-mode: difference;
+    }
+
+    .cursor-dot {
+      position: fixed;
+      width: 5px;
+      height: 5px;
+      background: #ff6a00;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 100000;
+      transform: translate(-50%, -50%);
+    }
+
+    /* ===============================
+       LOADER
+    =============================== */
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: #030303;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition:
+        opacity 0.7s ease,
+        visibility 0.7s ease;
+    }
+
+    .loader.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(30px, 5vw, 70px);
+      text-transform: uppercase;
+      letter-spacing: -3px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #ff7b00, #fff);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: loaderText 1.3s linear infinite;
+    }
+
+    .loader-line {
+      width: 240px;
+      height: 2px;
+      margin-top: 25px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .loader-line::before {
+      content: "";
+      display: block;
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, #ff6600, #ffaa00);
+      animation: loading 1s infinite linear;
+    }
+
+    @keyframes loading {
+      0% {
+        transform: translateX(-120%);
+      }
+
+      100% {
+        transform: translateX(300%);
+      }
+    }
+
+    @keyframes loaderText {
+      to {
+        background-position: 200%;
+      }
+    }
+
+    /* ===============================
+       THREE JS CANVAS
+    =============================== */
+
+    #threeCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='.75'/%3E%3C/svg%3E");
+    }
+
+    /* ===============================
+       GENERAL
+    =============================== */
+
+    .website {
+      position: relative;
+      z-index: 3;
+    }
+
+    section {
+      position: relative;
+    }
+
+    .container {
+      width: min(1180px, 90%);
+      margin: auto;
+    }
+
+    .orange {
+      color: #ff6800;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.55);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .section-label::before {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: #ff6800;
+    }
+
+    .section-title {
+      max-width: 900px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(44px, 7vw, 95px);
+      font-weight: 700;
+      letter-spacing: -5px;
+      line-height: 0.95;
+    }
+
+    /* ===============================
+       NAVBAR
+    =============================== */
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+      padding: 22px 0;
+      transition: 0.4s ease;
+    }
+
+    nav.scrolled {
+      padding: 14px 0;
+      background: rgba(3, 3, 3, 0.72);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-inner {
+      width: min(1260px, 92%);
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: #ff6500;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 35px;
+    }
+
+    .nav-links a {
+      position: relative;
+      color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
+      font-size: 13px;
+      transition: 0.3s ease;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 1px;
+      left: 0;
+      bottom: -5px;
+      background: #ff6800;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border-radius: 100px;
+      background: white;
+      color: black !important;
+      font-weight: 700;
+    }
+
+    /* ===============================
+       HERO
+    =============================== */
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      left: -300px;
+      top: 10%;
+      background: #ff5500;
+      opacity: 0.11;
+      filter: blur(150px);
+      border-radius: 50%;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      right: -280px;
+      bottom: -100px;
+      background: #ff9500;
+      opacity: 0.08;
+      filter: blur(150px);
+      border-radius: 50%;
+    }
+
+    .hero-content {
+      width: min(1260px, 92%);
+      margin: auto;
+      padding-top: 100px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.035);
+      backdrop-filter: blur(10px);
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff6800;
+      box-shadow:
+        0 0 10px #ff6800,
+        0 0 25px #ff6800;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: 0.4;
+        transform: scale(0.7);
+      }
+    }
+
+    .hero-title {
+      font-family: "Space Grotesk", sans-serif;
+      text-transform: uppercase;
+      font-size: clamp(64px, 11vw, 170px);
+      letter-spacing: -9px;
+      line-height: 0.76;
+      font-weight: 700;
+      max-width: 1250px;
+    }
+
+    .hero-title .line {
+      display: block;
+      overflow: hidden;
+    }
+
+    .hero-title .word {
+      display: inline-block;
+    }
+
+    .outline {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
+    }
+
+    .gradient-text {
+      background: linear-gradient(
+        90deg,
+        #ff4d00,
+        #ff8a00,
+        #ffd08a,
+        #ff4d00
+      );
+      background-size: 300%;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: gradientMove 6s linear infinite;
+    }
+
+    @keyframes gradientMove {
+      to {
+        background-position: 300%;
+      }
+    }
+
+    .hero-bottom {
+      margin-top: 55px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 35px;
+    }
+
+    .hero-description {
+      max-width: 500px;
+      color: rgba(255, 255, 255, 0.58);
+      line-height: 1.9;
+      font-size: 15px;
+    }
+
+    .hero-actions {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 25px;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      overflow: hidden;
+      transition: 0.35s ease;
+    }
+
+    .btn-primary {
+      background: #ff6500;
+      box-shadow: 0 15px 50px rgba(255, 85, 0, 0.24);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 65px rgba(255, 85, 0, 0.45);
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(15px);
+    }
+
+    .btn-secondary:hover {
+      background: white;
+      color: black;
+    }
+
+    .scroll-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transform: rotate(90deg) translateX(-40px);
+      transform-origin: center;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 4px;
+    }
+
+    .scroll-line {
+      width: 70px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-line::after {
+      content: "";
+      position: absolute;
+      width: 25px;
+      height: 100%;
+      background: #ff6500;
+      animation: scrollAnimation 2s infinite ease-in-out;
+    }
+
+    @keyframes scrollAnimation {
+      from {
+        left: -30px;
+      }
+
+      to {
+        left: 100%;
+      }
+    }
+
+    /* ===============================
+       MARQUEE
+    =============================== */
+
+    .marquee {
+      padding: 28px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 22s linear infinite;
+    }
+
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      padding-right: 28px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    .star {
+      color: #ff6500;
+    }
+
+    @keyframes marquee {
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* ===============================
+       ABOUT
+    =============================== */
+
+    .about {
+      padding: 160px 0;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 100px;
+      align-items: start;
+    }
+
+    .about-number {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .about-content p {
+      font-size: clamp(22px, 3vw, 40px);
+      line-height: 1.35;
+      letter-spacing: -1px;
+      color: rgba(255, 255, 255, 0.74);
+    }
+
+    .about-content p strong {
+      color: #ffffff;
+    }
+
+    /* ===============================
+       SERVICES
+    =============================== */
+
+    .services {
+      padding: 150px 0;
+    }
+
+    .services-header {
+      margin-bottom: 70px;
+    }
+
+    .service-list {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .service {
+      position: relative;
+      min-height: 145px;
+      display: grid;
+      grid-template-columns: 100px 1fr 300px 70px;
+      gap: 20px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      transition: 0.4s;
+      padding: 0 20px;
+    }
+
+    .service::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 90, 0, 0.2),
+        rgba(255, 255, 255, 0.02)
+      );
+      transform: translateX(-101%);
+      transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+      z-index: -1;
+    }
+
+    .service:hover::before {
+      transform: translateX(0);
+    }
+
+    .service-number {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 12px;
+    }
+
+    .service h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(28px, 4vw, 58px);
+      letter-spacing: -2px;
+      transition: 0.3s;
+    }
+
+    .service p {
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    .service-arrow {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      transition: 0.35s;
+    }
+
+    .service:hover .service-arrow {
+      background: #ff6500;
+      border-color: #ff6500;
+      transform: rotate(45deg);
+    }
+
+    /* ===============================
+       PROJECTS
+    =============================== */
+
+    .projects {
+      padding: 160px 0;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-top: 80px;
+    }
+
+    .project-card {
+      position: relative;
+      height: 560px;
+      border-radius: 26px;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 70% 25%,
+          rgba(255, 115, 0, 0.35),
+          transparent 38%
+        ),
+        linear-gradient(145deg, #161616, #070707);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.2s;
+      transform-style: preserve-3d;
+    }
+
+    .project-card:nth-child(2) {
+      margin-top: 100px;
+    }
+
+    .project-card:nth-child(3) {
+      margin-top: -100px;
+    }
+
+    .project-visual {
+      height: 70%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+      overflow: hidden;
+    }
+
+    .project-shape {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      transform-style: preserve-3d;
+      animation: projectShape 8s linear infinite;
+    }
+
+    .shape-face {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255, 128, 0, 0.5);
+      background: rgba(255, 90, 0, 0.04);
+      backdrop-filter: blur(5px);
+    }
+
+    .shape-face:nth-child(1) {
+      transform: rotateY(0deg) translateZ(120px);
+    }
+
+    .shape-face:nth-child(2) {
+      transform: rotateY(90deg) translateZ(120px);
+    }
+
+    .shape-face:nth-child(3) {
+      transform: rotateY(180deg) translateZ(120px);
+    }
+
+    .shape-face:nth-child(4) {
+      transform: rotateY(-90deg) translateZ(120px);
+    }
+
+    .shape-face:nth-child(5) {
+      transform: rotateX(90deg) translateZ(120px);
+    }
+
+    .shape-face:nth-child(6) {
+      transform: rotateX(-90deg) translateZ(120px);
+    }
+
+    @keyframes projectShape {
+      from {
+        transform: rotateX(0deg) rotateY(0deg);
+      }
+
+      to {
+        transform: rotateX(360deg) rotateY(360deg);
+      }
+    }
+
+    .project-info {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 30px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+    }
+
+    .project-category {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #ff7900;
+      margin-bottom: 10px;
+    }
+
+    .project-info h3 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 33px;
+      letter-spacing: -1px;
+    }
+
+    /* ===============================
+       3D GLASS SECTION
+    =============================== */
+
+    .experience {
+      padding: 190px 0;
+    }
+
+    .experience-wrap {
+      min-height: 650px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 35px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at center,
+          rgba(255, 95, 0, 0.18),
+          transparent 40%
+        ),
+        rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .experience-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(
+          rgba(255, 255, 255, 0.04) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.04) 1px,
+          transparent 1px
+        );
+      background-size: 50px 50px;
+      mask-image: radial-gradient(circle, black, transparent 70%);
+    }
+
+    .orbital {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+    }
+
+    .core {
+      width: 130px;
+      height: 130px;
+      background: radial-gradient(
+        circle at 30% 30%,
+        #ffcb91,
+        #ff5b00 45%,
+        #4b0d00
+      );
+      border-radius: 50%;
+      box-shadow:
+        0 0 50px rgba(255, 85, 0, 0.55),
+        0 0 120px rgba(255, 85, 0, 0.2);
+      animation: coreFloat 3s ease-in-out infinite;
+    }
+
+    .orbit {
+      position: absolute;
+      width: 330px;
+      height: 130px;
+      border: 1px solid rgba(255, 136, 0, 0.5);
+      border-radius: 50%;
+      transform-style: preserve-3d;
+    }
+
+    .orbit-one {
+      animation: orbitOne 7s linear infinite;
+    }
+
+    .orbit-two {
+      transform: rotateZ(60deg);
+      animation: orbitTwo 8s linear infinite reverse;
+    }
+
+    .orbit-three {
+      transform: rotateZ(-60deg);
+      animation: orbitThree 10s linear infinite;
+    }
+
+    @keyframes coreFloat {
+      50% {
+        transform: scale(1.05) translateY(-10px);
+      }
+    }
+
+    @keyframes orbitOne {
+      to {
+        transform: rotateX(360deg) rotateZ(360deg);
+      }
+    }
+
+    @keyframes orbitTwo {
+      to {
+        transform: rotateZ(420deg) rotateY(360deg);
+      }
+    }
+
+    @keyframes orbitThree {
+      to {
+        transform: rotateZ(300deg) rotateX(360deg);
+      }
+    }
+
+    .floating-tag {
+      position: absolute;
+      padding: 12px 18px;
+      background: rgba(10, 10, 10, 0.65);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: tagFloat 4s ease-in-out infinite;
+    }
+
+    .tag1 {
+      top: 18%;
+      left: 12%;
+    }
+
+    .tag2 {
+      top: 26%;
+      right: 10%;
+      animation-delay: -1s;
+    }
+
+    .tag3 {
+      bottom: 18%;
+      left: 18%;
+      animation-delay: -2s;
+    }
+
+    .tag4 {
+      bottom: 14%;
+      right: 14%;
+      animation-delay: -3s;
+    }
+
+    @keyframes tagFloat {
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    /* ===============================
+       CONTACT
+    =============================== */
+
+    .contact {
+      padding: 200px 0 80px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .contact-small {
+      color: #ff7300;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      font-size: 11px;
+      margin-bottom: 25px;
+    }
+
+    .contact h2 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(55px, 10vw, 150px);
+      line-height: 0.88;
+      letter-spacing: -8px;
+      text-transform: uppercase;
+    }
+
+    .contact h2 span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.38);
+    }
+
+    .contact-button {
+      width: 160px;
+      height: 160px;
+      margin: 60px auto;
+      border-radius: 50%;
+      background: #ff6500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 0 80px rgba(255, 90, 0, 0.3);
+      transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .contact-button:hover {
+      transform: scale(1.15) rotate(-8deg);
+      box-shadow: 0 0 120px rgba(255, 90, 0, 0.55);
+    }
+
+    footer {
+      margin-top: 120px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .socials {
+      display: flex;
+      gap: 20px;
+    }
+
+    .socials a {
+      color: rgba(255, 255, 255, 0.45);
+      text-decoration: none;
+    }
+
+    .socials a:hover {
+      color: #ff6500;
+    }
+
+
+    /* ===============================
+       WORK / CASE STUDIES
+    =============================== */
+    .work-details,.deliverables,.ai-journey,.process-section{padding:160px 0;position:relative;overflow:hidden}
+    .work-details:before,.ai-journey:before{content:"";position:absolute;width:560px;height:560px;border-radius:50%;background:#ff5b00;filter:blur(180px);opacity:.08;right:-300px;top:10%}
+    .work-lead{max-width:760px;margin-top:28px;color:rgba(255,255,255,.55);font-size:16px;line-height:1.9}
+    .metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:70px;perspective:1200px}
+    .metric-card{min-height:390px;padding:34px;border-radius:28px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012));backdrop-filter:blur(18px);position:relative;overflow:hidden;transform-style:preserve-3d;transition:.35s ease}
+    .metric-card:before{content:"";position:absolute;width:230px;height:230px;border-radius:50%;background:#ff6500;filter:blur(90px);opacity:.12;right:-80px;top:-70px}
+    .metric-card:hover{border-color:rgba(255,105,0,.35);box-shadow:0 35px 90px rgba(0,0,0,.35)}
+    .metric-kicker{font-size:10px;text-transform:uppercase;letter-spacing:3px;color:#ff7a00;margin-bottom:28px}
+    .metric-card h3{font-family:"Space Grotesk",sans-serif;font-size:31px;letter-spacing:-1px}
+    .metric-big{font-family:"Space Grotesk",sans-serif;font-size:clamp(44px,6vw,76px);letter-spacing:-4px;line-height:1;color:#fff;margin:28px 0 22px}
+    .metric-card p{color:rgba(255,255,255,.52);line-height:1.8;max-width:560px;font-size:13px}
+    .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px}.chip-row span{padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.58)}
+    .deliverable-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:70px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09);border-radius:28px;overflow:hidden}
+    .deliverable-card{min-height:330px;background:#070707;padding:38px;position:relative}.deliverable-card:hover{background:linear-gradient(145deg,#110b07,#070707)}
+    .deliverable-index{font-size:11px;letter-spacing:2px;color:#ff6a00}.deliverable-card h3{font-family:"Space Grotesk",sans-serif;font-size:34px;letter-spacing:-1.5px;margin:70px 0 18px}.deliverable-card p{color:rgba(255,255,255,.5);font-size:13px;line-height:1.8;max-width:480px}.deliverable-tags{margin-top:26px;color:rgba(255,255,255,.32);font-size:10px;text-transform:uppercase;letter-spacing:1.4px}
+    .journey-line{display:grid;grid-template-columns:repeat(4,1fr);margin-top:75px;border-top:1px solid rgba(255,255,255,.12)}
+    .journey-step{padding:34px 28px 0 0;position:relative}.journey-step:before{content:"";width:10px;height:10px;border-radius:50%;background:#ff6500;position:absolute;top:-5px;left:0;box-shadow:0 0 25px #ff6500}.journey-step b{font-size:11px;color:#ff6a00;letter-spacing:2px}.journey-step h3{font-family:"Space Grotesk",sans-serif;font-size:25px;margin:28px 0 12px}.journey-step p{color:rgba(255,255,255,.45);font-size:12px;line-height:1.8;padding-right:22px}
+    .process-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:70px}.process-card{padding:34px;border-radius:24px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}.process-card span{display:block;font-family:"Space Grotesk",sans-serif;font-size:46px;color:rgba(255,101,0,.7);margin-bottom:45px}.process-card h3{font-family:"Space Grotesk",sans-serif;font-size:28px;margin-bottom:14px}.process-card p{color:rgba(255,255,255,.46);font-size:13px;line-height:1.8}
+    @media(max-width:900px){.metric-grid,.deliverable-grid,.process-grid{grid-template-columns:1fr}.journey-line{grid-template-columns:1fr;border-top:0}.journey-step{border-top:1px solid rgba(255,255,255,.12);padding:35px 0}.journey-step:before{top:-5px}.work-details,.deliverables,.ai-journey,.process-section{padding:100px 0}}
+
+
+
+    /* ===============================
+       VIDEO SHOWCASE
+    =============================== */
+    .video-showcase{padding:160px 0;position:relative;overflow:hidden}
+    .video-showcase:before{content:"";position:absolute;width:720px;height:720px;border-radius:50%;background:#ff5b00;filter:blur(210px);opacity:.08;left:-380px;top:5%}
+    .video-showcase:after{content:"";position:absolute;width:620px;height:620px;border-radius:50%;background:#ff8a00;filter:blur(200px);opacity:.05;right:-360px;bottom:8%;pointer-events:none}
+    .video-intro{max-width:800px;margin-top:28px;color:rgba(255,255,255,.55);font-size:15px;line-height:1.9}
+    .video-controls{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:48px;position:relative;z-index:2}
+    .video-filter-bar{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+    .video-filter-bar::-webkit-scrollbar{display:none}
+    .video-filter{white-space:nowrap;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:rgba(255,255,255,.62);padding:11px 15px;border-radius:999px;font:700 9px/1 Inter,sans-serif;letter-spacing:1.15px;text-transform:uppercase;cursor:pointer;transition:.3s ease}
+    .video-filter:hover{border-color:rgba(255,101,0,.45);color:#fff}
+    .video-filter.active{background:#ff6500;border-color:#ff6500;color:#fff;box-shadow:0 10px 34px rgba(255,90,0,.22)}
+    .video-count{flex:0 0 auto;color:rgba(255,255,255,.32);font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
+    .video-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:36px;perspective:1500px;position:relative;z-index:2}
+    .video-showcase-card{position:relative;min-width:0;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111,#060606);box-shadow:0 24px 75px rgba(0,0,0,.24);transform-style:preserve-3d;transition:border-color .35s ease,box-shadow .35s ease,opacity .3s ease,transform .3s ease}
+    .video-showcase-card[hidden]{display:none!important}
+    .video-showcase-card:hover{border-color:rgba(255,101,0,.42);box-shadow:0 34px 100px rgba(0,0,0,.48),0 0 50px rgba(255,90,0,.07)}
+    .video-frame{position:relative;aspect-ratio:9/16;overflow:hidden;background:#050505;cursor:pointer}
+    .video-frame img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.9) contrast(1.05);transition:transform .7s cubic-bezier(.16,1,.3,1),filter .5s ease}
+    .video-showcase-card:hover .video-frame img{transform:scale(1.05);filter:saturate(1.05) contrast(1.08)}
+    .video-frame:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.08) 48%,rgba(0,0,0,.78));pointer-events:none}
+    .video-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:rgba(255,101,0,.95);border:1px solid rgba(255,255,255,.32);box-shadow:0 0 0 11px rgba(255,101,0,.09),0 18px 60px rgba(255,80,0,.34);z-index:3;transition:.35s cubic-bezier(.16,1,.3,1)}
+    .video-play:before{content:"";margin-left:5px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:14px solid #fff}
+    .video-showcase-card:hover .video-play{transform:translate(-50%,-50%) scale(1.09);box-shadow:0 0 0 16px rgba(255,101,0,.07),0 22px 70px rgba(255,80,0,.46)}
+    .video-badge{position:absolute;left:14px;top:14px;z-index:4;padding:8px 10px;border-radius:999px;background:rgba(3,3,3,.74);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px);font-size:8px;letter-spacing:1.2px;text-transform:uppercase;color:#fff}
+    .video-badge span{color:#ff7200}
+    .video-meta{padding:20px 20px 23px;position:relative;z-index:4}
+    .video-project{font-size:8px;letter-spacing:1.9px;text-transform:uppercase;color:#ff7200;margin-bottom:9px}
+    .video-meta h3{font-family:"Space Grotesk",sans-serif;font-size:21px;letter-spacing:-.7px;line-height:1.08}
+    .video-meta p{margin-top:10px;color:rgba(255,255,255,.43);font-size:10.5px;line-height:1.65}
+    .video-source-link{display:inline-flex;align-items:center;gap:8px;margin-top:16px;color:rgba(255,255,255,.72);text-decoration:none;font-size:9px;text-transform:uppercase;letter-spacing:1.05px}
+    .video-source-link:hover{color:#ff7200}
+    .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;background:#000}
+    .video-note{margin-top:28px;color:rgba(255,255,255,.3);font-size:10px;letter-spacing:1px;text-transform:uppercase}
+    @media(max-width:1200px){.video-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:900px){.video-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.video-controls{align-items:flex-start;flex-direction:column}.video-count{padding-left:2px}}
+    @media(max-width:560px){.video-showcase{padding:100px 0}.video-grid{grid-template-columns:1fr}.video-frame{aspect-ratio:9/16}.video-meta h3{font-size:24px}}
+
+
+    /* ===============================
+       REVEAL ANIMATION
+    =============================== */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(70px);
+      transition:
+        opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===============================
+       RESPONSIVE
+    =============================== */
+
+    @media (max-width: 900px) {
+      .cursor,
+      .cursor-dot {
+        display: none;
+      }
+
+      .nav-links a:not(.nav-btn) {
+        display: none;
+      }
+
+      .hero-title {
+        letter-spacing: -5px;
+      }
+
+      .hero-bottom {
+        align-items: flex-start;
+      }
+
+      .scroll-box {
+        display: none;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .service {
+        grid-template-columns: 50px 1fr 50px;
+        padding: 35px 10px;
+      }
+
+      .service p {
+        display: none;
+      }
+
+      .project-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-card:nth-child(2),
+      .project-card:nth-child(3) {
+        margin-top: 0;
+      }
+
+      .contact h2 {
+        letter-spacing: -4px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-title {
+        font-size: 62px;
+        line-height: 0.82;
+        letter-spacing: -4px;
+      }
+
+      .hero-bottom {
+        margin-top: 40px;
+      }
+
+      .hero-description {
+        font-size: 13px;
+      }
+
+      .about,
+      .services,
+      .projects,
+      .experience {
+        padding: 100px 0;
+      }
+
+      .section-title {
+        letter-spacing: -3px;
+      }
+
+      .project-card {
+        height: 470px;
+      }
+
+      .orbital {
+        transform: scale(0.7);
+      }
+
+      .floating-tag {
+        font-size: 8px;
+      }
+
+      .contact {
+        padding-top: 120px;
+      }
+
+      footer {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOADING SCREEN -->
+  <div class="loader" id="loader">
+    <div class="loader-title">Syed Meesam Abbas</div>
+    <div class="loader-line"></div>
+  </div>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor"></div>
+  <div class="cursor-dot"></div>
+
+  <!-- THREE JS -->
+  <canvas id="threeCanvas"></canvas>
+
+  <!-- NOISE -->
+  <div class="noise"></div>
+
+  <div class="website">
+
+    <!-- NAVBAR -->
+    <nav id="navbar">
+      <div class="nav-inner">
+
+        <a href="#" class="logo">
+          SYED MEESAM<span>.</span>
+        </a>
+
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#services">Services</a>
+          <a href="#projects">Work</a>
+          <a href="#videos">Videos</a>
+          <a href="#capabilities">Capabilities</a>
+          <a href="#contact" class="nav-btn">Let's Talk ↗</a>
+        </div>
+
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="hero-badge">
+          <span class="status-dot"></span>
+          DIGITAL DELIVERABLES • CREATIVE • WEB • GROWTH
+        </div>
+
+        <h1 class="hero-title">
+
+          <span class="line">
+            <span class="word">SYED</span>
+          </span>
+
+          <span class="line">
+            <span class="word outline">MEESAM</span>
+          </span>
+
+          <span class="line">
+            <span class="word gradient-text">ABBAS.</span>
+          </span>
+
+        </h1>
+
+        <div class="hero-bottom">
+
+          <div>
+
+            <p class="hero-description">
+              Building digital work around real business goals — combining <strong style="color:#fff;">high-performance websites</strong>, <strong style="color:#fff;">creative production</strong>, paid acquisition and <strong style="color:#fff;">AI-supported workflows</strong> into one connected execution system.
+            </p>
+
+            <div class="hero-actions">
+
+              <a href="#projects" class="btn btn-primary">
+                Explore Selected Work
+                <span>↗</span>
+              </a>
+
+              <a href="#contact" class="btn btn-secondary">
+                Start A Project
+                <span>→</span>
+              </a>
+
+            </div>
+
+          </div>
+
+          <div class="scroll-box">
+            Scroll to explore
+            <div class="scroll-line"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee">
+
+      <div class="marquee-track">
+
+        <div class="marquee-item">
+          Creative Developer <span class="star">✦</span>
+          3D Experiences <span class="star">✦</span>
+          Motion Design <span class="star">✦</span>
+          UI / UX <span class="star">✦</span>
+          WebGL <span class="star">✦</span>
+        </div>
+
+        <div class="marquee-item">
+          Creative Developer <span class="star">✦</span>
+          3D Experiences <span class="star">✦</span>
+          Motion Design <span class="star">✦</span>
+          UI / UX <span class="star">✦</span>
+          WebGL <span class="star">✦</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+
+      <div class="container">
+
+        <div class="about-grid reveal">
+
+          <div>
+
+            <div class="section-label">
+              About Me
+            </div>
+
+            <div class="about-number">
+              01 / INTRODUCTION
+            </div>
+
+          </div>
+
+          <div class="about-content">
+
+            <p>
+              I'm <strong>Syed Meesam Abbas</strong>, focused on connecting strategy, creative and web technology into digital systems that are built to perform. My work spans <strong>website development, paid advertising, short-form creative, social content and AI-assisted production</strong> — with the visual craft of an immersive 3D experience.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SERVICES -->
+    <section class="services" id="services">
+
+      <div class="container">
+
+        <div class="services-header reveal">
+
+          <div class="section-label">
+            Capabilities
+          </div>
+
+          <h2 class="section-title">
+            DIGITAL <span class="orange">EXPERIENCES</span>
+            BUILT TO STAND OUT.
+          </h2>
+
+        </div>
+
+        <div class="service-list">
+
+          <div class="service reveal">
+            <div class="service-number">01</div>
+
+            <h3>Website Development</h3>
+
+            <p>
+              Fast, conversion-focused web platforms, storefronts and landing experiences with responsive architecture and premium interaction.
+            </p>
+
+            <div class="service-arrow">↗</div>
+          </div>
+
+          <div class="service reveal">
+            <div class="service-number">02</div>
+
+            <h3>Paid Advertising</h3>
+
+            <p>
+              Direct-response campaign structure, creative testing and landing-page alignment for paid acquisition across Meta and TikTok.
+            </p>
+
+            <div class="service-arrow">↗</div>
+          </div>
+
+          <div class="service reveal">
+            <div class="service-number">03</div>
+
+            <h3>Creative Content</h3>
+
+            <p>
+              Short-form video editing, motion-led ad creative, hook testing, promotional scripts and social campaign assets.
+            </p>
+
+            <div class="service-arrow">↗</div>
+          </div>
+
+          <div class="service reveal">
+            <div class="service-number">04</div>
+
+            <h3>AI Marketing Workflows</h3>
+
+            <p>
+              Practical AI-assisted creative systems for consistent characters, voice workflows and scalable promotional asset production.
+            </p>
+
+            <div class="service-arrow">↗</div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="projects" id="projects">
+
+      <div class="container">
+
+        <div class="reveal">
+
+          <div class="section-label">
+            Selected Work
+          </div>
+
+          <h2 class="section-title">
+            FEATURED
+            <span class="orange">PROJECTS.</span>
+          </h2>
+
+        </div>
+
+        <div class="project-grid">
+
+          <!-- CARD 1 -->
+          <div class="project-card tilt reveal">
+
+            <div class="project-visual">
+
+              <div class="project-shape">
+
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+
+              </div>
+
+            </div>
+
+            <div class="project-info">
+
+              <div class="project-category">
+                Agriculture & E-Commerce
+              </div>
+
+              <h3>Black Gold Fertilizer</h3>
+
+            </div>
+
+          </div>
+
+          <!-- CARD 2 -->
+          <div class="project-card tilt reveal">
+
+            <div class="project-visual">
+
+              <div
+                class="project-shape"
+                style="transform:scale(.7) rotate(45deg);"
+              >
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+              </div>
+
+            </div>
+
+            <div class="project-info">
+
+              <div class="project-category">
+                Livestock & Seasonal Campaigns
+              </div>
+
+              <h3>Wajib Livestock</h3>
+
+            </div>
+
+          </div>
+
+          <!-- CARD 3 -->
+          <div class="project-card tilt reveal">
+
+            <div class="project-visual">
+
+              <div class="orbital" style="transform:scale(.55)">
+
+                <div class="core"></div>
+
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+                <div class="orbit orbit-three"></div>
+
+              </div>
+
+            </div>
+
+            <div class="project-info">
+
+              <div class="project-category">
+                Renovation & Local Services
+              </div>
+
+              <h3>RK Reno Solutions</h3>
+
+            </div>
+
+          </div>
+
+          <!-- CARD 4 -->
+          <div class="project-card tilt reveal">
+
+            <div class="project-visual">
+
+              <div
+                class="project-shape"
+                style="border-radius:50%;"
+              >
+
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+                <div class="shape-face"></div>
+
+              </div>
+
+            </div>
+
+            <div class="project-info">
+
+              <div class="project-category">
+                AI Platform & App Development
+              </div>
+
+              <h3>ConvortAI</h3>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PROJECT VIDEO SHOWCASE -->
+    <section class="video-showcase" id="videos">
+      <div class="container">
+        <div class="reveal">
+          <div class="section-label">Project Video Showcase</div>
+          <h2 class="section-title">40 SHORT-FORM VIDEOS. <span class="orange">PLAY THEM HERE.</span></h2>
+          <p class="video-intro">A complete short-form portfolio across gym and fitness creative, ConvortAI, Shopinq Online, ViralNaturals, YouTube production and Black Gold Fertilizer. Use the filters to browse a project, then click any card to play it directly on the page.</p>
+        </div>
+
+        <div class="video-controls reveal">
+          <div class="video-filter-bar" aria-label="Filter project videos">
+            <button class="video-filter active" type="button" data-filter="all">All Videos (40)</button>
+            <button class="video-filter" type="button" data-filter="gym">Gym / Fitness (10)</button>
+            <button class="video-filter" type="button" data-filter="convort">ConvortAI (5)</button>
+            <button class="video-filter" type="button" data-filter="shopinq">Shopinq Online (16)</button>
+            <button class="video-filter" type="button" data-filter="viral">ViralNaturals (2)</button>
+            <button class="video-filter" type="button" data-filter="youtube">YouTube Creative (3)</button>
+            <button class="video-filter" type="button" data-filter="bgf">Black Gold (4)</button>
+          </div>
+          <div class="video-count" id="videoCount">Showing 40 videos</div>
+        </div>
+
+        <div class="video-grid">
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="V0Ax0MGuuNw" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 01">
+              <img src="https://img.youtube.com/vi/V0Ax0MGuuNw/hqdefault.jpg" alt="Gym / Fitness — Short 01 thumbnail" loading="lazy">
+              <div class="video-badge"><span>01</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 01</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/V0Ax0MGuuNw?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="AuRwX_tcLUk" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 02">
+              <img src="https://img.youtube.com/vi/AuRwX_tcLUk/hqdefault.jpg" alt="Gym / Fitness — Short 02 thumbnail" loading="lazy">
+              <div class="video-badge"><span>02</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 02</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/AuRwX_tcLUk?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="kNxaAF6NZMA" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 03">
+              <img src="https://img.youtube.com/vi/kNxaAF6NZMA/hqdefault.jpg" alt="Gym / Fitness — Short 03 thumbnail" loading="lazy">
+              <div class="video-badge"><span>03</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 03</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/kNxaAF6NZMA?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="KNoWgPy9UBU" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 04">
+              <img src="https://img.youtube.com/vi/KNoWgPy9UBU/hqdefault.jpg" alt="Gym / Fitness — Short 04 thumbnail" loading="lazy">
+              <div class="video-badge"><span>04</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 04</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/KNoWgPy9UBU?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="zficrS1CkU4" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 05">
+              <img src="https://img.youtube.com/vi/zficrS1CkU4/hqdefault.jpg" alt="Gym / Fitness — Short 05 thumbnail" loading="lazy">
+              <div class="video-badge"><span>05</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 05</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/zficrS1CkU4?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="gKTtFGIi8S8" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 06">
+              <img src="https://img.youtube.com/vi/gKTtFGIi8S8/hqdefault.jpg" alt="Gym / Fitness — Short 06 thumbnail" loading="lazy">
+              <div class="video-badge"><span>06</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 06</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/gKTtFGIi8S8?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="XFBvBAuc15A" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 07">
+              <img src="https://img.youtube.com/vi/XFBvBAuc15A/hqdefault.jpg" alt="Gym / Fitness — Short 07 thumbnail" loading="lazy">
+              <div class="video-badge"><span>07</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 07</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/XFBvBAuc15A?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="xGi53p3UmOM" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 08">
+              <img src="https://img.youtube.com/vi/xGi53p3UmOM/hqdefault.jpg" alt="Gym / Fitness — Short 08 thumbnail" loading="lazy">
+              <div class="video-badge"><span>08</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 08</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/xGi53p3UmOM?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="fE4YK6xdNco" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 09">
+              <img src="https://img.youtube.com/vi/fE4YK6xdNco/hqdefault.jpg" alt="Gym / Fitness — Short 09 thumbnail" loading="lazy">
+              <div class="video-badge"><span>09</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 09</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/fE4YK6xdNco?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="gym">
+            <div class="video-frame js-video" data-video="Yc7hwqNne_s" role="button" tabindex="0" aria-label="Play Gym / Fitness — Short 10">
+              <img src="https://img.youtube.com/vi/Yc7hwqNne_s/hqdefault.jpg" alt="Gym / Fitness — Short 10 thumbnail" loading="lazy">
+              <div class="video-badge"><span>10</span> / Gym / Fitness</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Gym / Fitness Creative</div>
+              <h3>Gym / Fitness — Short 10</h3>
+              <p>Short-form gym and fitness creative produced for social-first viewing and campaign use.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/Yc7hwqNne_s?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="convort">
+            <div class="video-frame js-video" data-video="NvXKjRNad6Q" role="button" tabindex="0" aria-label="Play ConvortAI — Short 01">
+              <img src="https://img.youtube.com/vi/NvXKjRNad6Q/hqdefault.jpg" alt="ConvortAI — Short 01 thumbnail" loading="lazy">
+              <div class="video-badge"><span>01</span> / ConvortAI</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">AI Platform Creative</div>
+              <h3>ConvortAI — Short 01</h3>
+              <p>Product-led AI platform creative combining concise messaging, motion and digital storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/NvXKjRNad6Q?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="convort">
+            <div class="video-frame js-video" data-video="iGsC02Sr7T8" role="button" tabindex="0" aria-label="Play ConvortAI — Short 02">
+              <img src="https://img.youtube.com/vi/iGsC02Sr7T8/hqdefault.jpg" alt="ConvortAI — Short 02 thumbnail" loading="lazy">
+              <div class="video-badge"><span>02</span> / ConvortAI</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">AI Platform Creative</div>
+              <h3>ConvortAI — Short 02</h3>
+              <p>Product-led AI platform creative combining concise messaging, motion and digital storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/iGsC02Sr7T8?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="convort">
+            <div class="video-frame js-video" data-video="QxpK5WZlvG4" role="button" tabindex="0" aria-label="Play ConvortAI — Short 03">
+              <img src="https://img.youtube.com/vi/QxpK5WZlvG4/hqdefault.jpg" alt="ConvortAI — Short 03 thumbnail" loading="lazy">
+              <div class="video-badge"><span>03</span> / ConvortAI</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">AI Platform Creative</div>
+              <h3>ConvortAI — Short 03</h3>
+              <p>Product-led AI platform creative combining concise messaging, motion and digital storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/QxpK5WZlvG4?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="convort">
+            <div class="video-frame js-video" data-video="SVGmrlraDU4" role="button" tabindex="0" aria-label="Play ConvortAI — Short 04">
+              <img src="https://img.youtube.com/vi/SVGmrlraDU4/hqdefault.jpg" alt="ConvortAI — Short 04 thumbnail" loading="lazy">
+              <div class="video-badge"><span>04</span> / ConvortAI</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">AI Platform Creative</div>
+              <h3>ConvortAI — Short 04</h3>
+              <p>Product-led AI platform creative combining concise messaging, motion and digital storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/SVGmrlraDU4?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="convort">
+            <div class="video-frame js-video" data-video="x3lpVB1pwfE" role="button" tabindex="0" aria-label="Play ConvortAI — Short 05">
+              <img src="https://img.youtube.com/vi/x3lpVB1pwfE/hqdefault.jpg" alt="ConvortAI — Short 05 thumbnail" loading="lazy">
+              <div class="video-badge"><span>05</span> / ConvortAI</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">AI Platform Creative</div>
+              <h3>ConvortAI — Short 05</h3>
+              <p>Product-led AI platform creative combining concise messaging, motion and digital storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/x3lpVB1pwfE?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="PnYdfatKb4I" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 01">
+              <img src="https://img.youtube.com/vi/PnYdfatKb4I/hqdefault.jpg" alt="Shopinq Online — Short 01 thumbnail" loading="lazy">
+              <div class="video-badge"><span>01</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 01</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/PnYdfatKb4I?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="XeTorMUqw80" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 02">
+              <img src="https://img.youtube.com/vi/XeTorMUqw80/hqdefault.jpg" alt="Shopinq Online — Short 02 thumbnail" loading="lazy">
+              <div class="video-badge"><span>02</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 02</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/XeTorMUqw80?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="QhIcLPeSJR0" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 03">
+              <img src="https://img.youtube.com/vi/QhIcLPeSJR0/hqdefault.jpg" alt="Shopinq Online — Short 03 thumbnail" loading="lazy">
+              <div class="video-badge"><span>03</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 03</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/QhIcLPeSJR0?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="hX8ZygG_GUU" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 04">
+              <img src="https://img.youtube.com/vi/hX8ZygG_GUU/hqdefault.jpg" alt="Shopinq Online — Short 04 thumbnail" loading="lazy">
+              <div class="video-badge"><span>04</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 04</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/hX8ZygG_GUU?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="iB_89uTqJAY" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 05">
+              <img src="https://img.youtube.com/vi/iB_89uTqJAY/hqdefault.jpg" alt="Shopinq Online — Short 05 thumbnail" loading="lazy">
+              <div class="video-badge"><span>05</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 05</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/iB_89uTqJAY?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="TgcApiQdyK4" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 06">
+              <img src="https://img.youtube.com/vi/TgcApiQdyK4/hqdefault.jpg" alt="Shopinq Online — Short 06 thumbnail" loading="lazy">
+              <div class="video-badge"><span>06</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 06</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/TgcApiQdyK4?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="7OAY8npAkZI" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 07">
+              <img src="https://img.youtube.com/vi/7OAY8npAkZI/hqdefault.jpg" alt="Shopinq Online — Short 07 thumbnail" loading="lazy">
+              <div class="video-badge"><span>07</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 07</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/7OAY8npAkZI?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="JWuO6-18Hcc" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 08">
+              <img src="https://img.youtube.com/vi/JWuO6-18Hcc/hqdefault.jpg" alt="Shopinq Online — Short 08 thumbnail" loading="lazy">
+              <div class="video-badge"><span>08</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 08</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/JWuO6-18Hcc?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="5s-p69DOayM" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 09">
+              <img src="https://img.youtube.com/vi/5s-p69DOayM/hqdefault.jpg" alt="Shopinq Online — Short 09 thumbnail" loading="lazy">
+              <div class="video-badge"><span>09</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 09</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/5s-p69DOayM?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="2w9ueth0pAM" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 10">
+              <img src="https://img.youtube.com/vi/2w9ueth0pAM/hqdefault.jpg" alt="Shopinq Online — Short 10 thumbnail" loading="lazy">
+              <div class="video-badge"><span>10</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 10</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/2w9ueth0pAM?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="rBYvM-QKGvQ" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 11">
+              <img src="https://img.youtube.com/vi/rBYvM-QKGvQ/hqdefault.jpg" alt="Shopinq Online — Short 11 thumbnail" loading="lazy">
+              <div class="video-badge"><span>11</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 11</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/rBYvM-QKGvQ?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="6WX5tPVMQAM" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 12">
+              <img src="https://img.youtube.com/vi/6WX5tPVMQAM/hqdefault.jpg" alt="Shopinq Online — Short 12 thumbnail" loading="lazy">
+              <div class="video-badge"><span>12</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 12</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/6WX5tPVMQAM?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="yu7822jlDtw" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 13">
+              <img src="https://img.youtube.com/vi/yu7822jlDtw/hqdefault.jpg" alt="Shopinq Online — Short 13 thumbnail" loading="lazy">
+              <div class="video-badge"><span>13</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 13</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/yu7822jlDtw?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="xO9Xe2LO6co" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 14">
+              <img src="https://img.youtube.com/vi/xO9Xe2LO6co/hqdefault.jpg" alt="Shopinq Online — Short 14 thumbnail" loading="lazy">
+              <div class="video-badge"><span>14</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 14</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/xO9Xe2LO6co?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="I4yBMpeYMt4" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 15">
+              <img src="https://img.youtube.com/vi/I4yBMpeYMt4/hqdefault.jpg" alt="Shopinq Online — Short 15 thumbnail" loading="lazy">
+              <div class="video-badge"><span>15</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 15</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/I4yBMpeYMt4?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="shopinq">
+            <div class="video-frame js-video" data-video="Rs6tuXUOcf8" role="button" tabindex="0" aria-label="Play Shopinq Online — Short 16">
+              <img src="https://img.youtube.com/vi/Rs6tuXUOcf8/hqdefault.jpg" alt="Shopinq Online — Short 16 thumbnail" loading="lazy">
+              <div class="video-badge"><span>16</span> / Shopinq Online</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">E-Commerce Product Creative</div>
+              <h3>Shopinq Online — Short 16</h3>
+              <p>Direct-response e-commerce short designed to demonstrate products quickly for social audiences.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/Rs6tuXUOcf8?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="viral">
+            <div class="video-frame js-video" data-video="nLn41HfGZ7U" role="button" tabindex="0" aria-label="Play ViralNaturals — Short 01">
+              <img src="https://img.youtube.com/vi/nLn41HfGZ7U/hqdefault.jpg" alt="ViralNaturals — Short 01 thumbnail" loading="lazy">
+              <div class="video-badge"><span>01</span> / ViralNaturals</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Wellness / Product Creative</div>
+              <h3>ViralNaturals — Short 01</h3>
+              <p>Wellness and product-focused short-form creative built for fast attention and clear presentation.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/nLn41HfGZ7U?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="viral">
+            <div class="video-frame js-video" data-video="yFpkpUN67lI" role="button" tabindex="0" aria-label="Play ViralNaturals — Short 02">
+              <img src="https://img.youtube.com/vi/yFpkpUN67lI/hqdefault.jpg" alt="ViralNaturals — Short 02 thumbnail" loading="lazy">
+              <div class="video-badge"><span>02</span> / ViralNaturals</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Wellness / Product Creative</div>
+              <h3>ViralNaturals — Short 02</h3>
+              <p>Wellness and product-focused short-form creative built for fast attention and clear presentation.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/yFpkpUN67lI?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="youtube">
+            <div class="video-frame js-video" data-video="KS7uOKAeeNQ" role="button" tabindex="0" aria-label="Play YouTube Creative — Short 01">
+              <img src="https://img.youtube.com/vi/KS7uOKAeeNQ/hqdefault.jpg" alt="YouTube Creative — Short 01 thumbnail" loading="lazy">
+              <div class="video-badge"><span>01</span> / YouTube Creative</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Short-Form Creative</div>
+              <h3>YouTube Creative — Short 01</h3>
+              <p>Short-form creative execution prepared for YouTube and cross-platform social distribution.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/KS7uOKAeeNQ?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="youtube">
+            <div class="video-frame js-video" data-video="DkupvAvJKZk" role="button" tabindex="0" aria-label="Play YouTube Creative — Short 02">
+              <img src="https://img.youtube.com/vi/DkupvAvJKZk/hqdefault.jpg" alt="YouTube Creative — Short 02 thumbnail" loading="lazy">
+              <div class="video-badge"><span>02</span> / YouTube Creative</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Short-Form Creative</div>
+              <h3>YouTube Creative — Short 02</h3>
+              <p>Short-form creative execution prepared for YouTube and cross-platform social distribution.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/DkupvAvJKZk?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="youtube">
+            <div class="video-frame js-video" data-video="LMFCxIUjSTQ" role="button" tabindex="0" aria-label="Play YouTube Creative — Short 03">
+              <img src="https://img.youtube.com/vi/LMFCxIUjSTQ/hqdefault.jpg" alt="YouTube Creative — Short 03 thumbnail" loading="lazy">
+              <div class="video-badge"><span>03</span> / YouTube Creative</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Short-Form Creative</div>
+              <h3>YouTube Creative — Short 03</h3>
+              <p>Short-form creative execution prepared for YouTube and cross-platform social distribution.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/LMFCxIUjSTQ?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="bgf">
+            <div class="video-frame js-video" data-video="gJmf6q-OEfw" role="button" tabindex="0" aria-label="Play Black Gold — Short 01">
+              <img src="https://img.youtube.com/vi/gJmf6q-OEfw/hqdefault.jpg" alt="Black Gold — Short 01 thumbnail" loading="lazy">
+              <div class="video-badge"><span>01</span> / Black Gold</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Black Gold Fertilizer</div>
+              <h3>Black Gold — Short 01</h3>
+              <p>Black Gold Fertilizer short-form campaign creative focused on product, lawn and soil storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/gJmf6q-OEfw?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="bgf">
+            <div class="video-frame js-video" data-video="a7P9Mg9h_-I" role="button" tabindex="0" aria-label="Play Black Gold — Short 02">
+              <img src="https://img.youtube.com/vi/a7P9Mg9h_-I/hqdefault.jpg" alt="Black Gold — Short 02 thumbnail" loading="lazy">
+              <div class="video-badge"><span>02</span> / Black Gold</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Black Gold Fertilizer</div>
+              <h3>Black Gold — Short 02</h3>
+              <p>Black Gold Fertilizer short-form campaign creative focused on product, lawn and soil storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/a7P9Mg9h_-I?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="bgf">
+            <div class="video-frame js-video" data-video="fWif9UIexqU" role="button" tabindex="0" aria-label="Play Black Gold — Short 03">
+              <img src="https://img.youtube.com/vi/fWif9UIexqU/hqdefault.jpg" alt="Black Gold — Short 03 thumbnail" loading="lazy">
+              <div class="video-badge"><span>03</span> / Black Gold</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Black Gold Fertilizer</div>
+              <h3>Black Gold — Short 03</h3>
+              <p>Black Gold Fertilizer short-form campaign creative focused on product, lawn and soil storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/fWif9UIexqU?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+          <article class="video-showcase-card tilt reveal" data-category="bgf">
+            <div class="video-frame js-video" data-video="GcRVYK66K5I" role="button" tabindex="0" aria-label="Play Black Gold — Short 04">
+              <img src="https://img.youtube.com/vi/GcRVYK66K5I/hqdefault.jpg" alt="Black Gold — Short 04 thumbnail" loading="lazy">
+              <div class="video-badge"><span>04</span> / Black Gold</div>
+              <div class="video-play" aria-hidden="true"></div>
+            </div>
+            <div class="video-meta">
+              <div class="video-project">Black Gold Fertilizer</div>
+              <h3>Black Gold — Short 04</h3>
+              <p>Black Gold Fertilizer short-form campaign creative focused on product, lawn and soil storytelling.</p>
+              <a class="video-source-link" href="https://youtube.com/shorts/GcRVYK66K5I?feature=share" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+            </div>
+          </article>
+        </div>
+
+        <div class="video-note reveal">40 videos • Loads on click • YouTube-hosted • Filter by project</div>
+      </div>
+    </section>
+
+
+    <!-- VERIFIED WORK -->
+    <section class="work-details" id="capabilities">
+      <div class="container">
+        <div class="reveal">
+          <div class="section-label">Documented Work</div>
+          <h2 class="section-title">REAL PROJECTS. <span class="orange">REAL EXECUTION.</span></h2>
+          <p class="work-lead">A closer look at selected client outcomes and the digital systems behind them — from e-commerce growth and seasonal campaigns to local-service websites and AI platform partnerships.</p>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card reveal tilt">
+            <div class="metric-kicker">E-Commerce Case Study</div>
+            <h3>Black Gold Fertilizer</h3>
+            <div class="metric-big">PKR 30M+</div>
+            <p>Delivered-order revenue supported across a 24-month growth period, alongside 29,000+ total orders and 22,000+ delivered packages.</p>
+            <div class="chip-row"><span>Meta Ads</span><span>WooCommerce UX</span><span>Creative Testing</span></div>
+          </article>
+
+          <article class="metric-card reveal tilt">
+            <div class="metric-kicker">Seasonal Campaign</div>
+            <h3>Wajib Livestock</h3>
+            <div class="metric-big">PKR 4.2M+</div>
+            <p>Seasonal Qurbani campaign sales supported during a focused three-week campaign that produced 150+ animal purchases.</p>
+            <div class="chip-row"><span>Video Ads</span><span>Lead Routing</span><span>WhatsApp Sales</span></div>
+          </article>
+
+          <article class="metric-card reveal tilt">
+            <div class="metric-kicker">Local Search & Web</div>
+            <h3>RK Reno Solutions</h3>
+            <div class="metric-big">KL + Selangor</div>
+            <p>Responsive website, location-focused service content and a technical local-search foundation for renovation and HVAC services.</p>
+            <div class="chip-row"><span>Web Design</span><span>Service Pages</span><span>Local SEO</span></div>
+          </article>
+
+          <article class="metric-card reveal tilt">
+            <div class="metric-kicker">Technology Partnership</div>
+            <h3>ConvortAI</h3>
+            <div class="metric-big">ONGOING</div>
+            <p>Web application development and continued support across product execution, project management, social media, creative production and digital growth.</p>
+            <div class="chip-row"><span>Web App</span><span>Product</span><span>Growth</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- DELIVERABLES -->
+    <section class="deliverables">
+      <div class="container">
+        <div class="reveal">
+          <div class="section-label">Visual Deliverables</div>
+          <h2 class="section-title">WHAT I BUILD, MANAGE <span class="orange">& IMPROVE.</span></h2>
+        </div>
+
+        <div class="deliverable-grid">
+          <article class="deliverable-card reveal">
+            <span class="deliverable-index">01</span>
+            <h3>High-Speed Web Platforms</h3>
+            <p>Responsive web experiences and e-commerce storefronts engineered around performance, mobile clarity and conversion-focused layouts.</p>
+            <div class="deliverable-tags">Astro Architecture • WooCommerce • Mobile UX</div>
+          </article>
+          <article class="deliverable-card reveal">
+            <span class="deliverable-index">02</span>
+            <h3>Direct-Response Campaigns</h3>
+            <p>Paid social campaigns that connect ad-account structure, creative iteration, audience testing and purpose-built landing experiences.</p>
+            <div class="deliverable-tags">Meta • TikTok • A/B Testing</div>
+          </article>
+          <article class="deliverable-card reveal">
+            <span class="deliverable-index">03</span>
+            <h3>Video & Motion Creative</h3>
+            <p>Short-form edits, campaign hooks, motion banners, promotional captions and conversion-focused scripts made for rapid testing.</p>
+            <div class="deliverable-tags">Video Edits • Scripts • Social Banners</div>
+          </article>
+          <article class="deliverable-card reveal">
+            <span class="deliverable-index">04</span>
+            <h3>AI Creative Pipelines</h3>
+            <p>Private creative workflows combining consistent digital identities, voice generation and scalable multi-format asset production.</p>
+            <div class="deliverable-tags">AI Characters • Voice • Private Infrastructure</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI JOURNEY -->
+    <section class="ai-journey">
+      <div class="container">
+        <div class="reveal">
+          <div class="section-label">AI Creative Innovation</div>
+          <h2 class="section-title">FROM EXPERIMENT TO <span class="orange">PRODUCTION SCALE.</span></h2>
+          <p class="work-lead">A private AI-assisted creative workflow evolved from early infrastructure experiments into a repeatable production system for consistent campaign characters and high-volume marketing assets.</p>
+        </div>
+        <div class="journey-line">
+          <div class="journey-step reveal"><b>01</b><h3>Infrastructure</h3><p>Private workflow designed for consistent character generation across changing scenes and campaign needs.</p></div>
+          <div class="journey-step reveal"><b>02</b><h3>Identity Matrix</h3><p>A reusable library of distinct male and female creative identities with consistent visual traits.</p></div>
+          <div class="journey-step reveal"><b>03</b><h3>Scale Production</h3><p>Thousands of creative frames, static variations and video-ready assets produced for multi-platform testing.</p></div>
+          <div class="journey-step reveal"><b>04</b><h3>Commercial Use</h3><p>Creative production connected directly to active campaigns, lead generation and conversion-focused growth work.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section class="process-section">
+      <div class="container">
+        <div class="reveal">
+          <div class="section-label">Working Method</div>
+          <h2 class="section-title">A CLEAR FOUR-STEP <span class="orange">EXECUTION SYSTEM.</span></h2>
+        </div>
+        <div class="process-grid">
+          <div class="process-card reveal"><span>01</span><h3>Discovery & Alignment</h3><p>Define the business goal, target audience, competitive context, project constraints and available assets.</p></div>
+          <div class="process-card reveal"><span>02</span><h3>Strategy & Roadmap</h3><p>Turn the goal into a structured plan for campaign angles, website architecture, content or AI-enabled workflow.</p></div>
+          <div class="process-card reveal"><span>03</span><h3>Production & Launch</h3><p>Build, design, edit and deploy the selected digital assets with the technical pieces connected from day one.</p></div>
+          <div class="process-card reveal"><span>04</span><h3>Review & Optimize</h3><p>Track user response, campaign performance and conversion flow, then improve the creative and delivery system.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D EXPERIENCE -->
+    <section class="experience">
+
+      <div class="container">
+
+        <div class="experience-wrap reveal">
+
+          <div class="floating-tag tag1">
+            Creative Direction
+          </div>
+
+          <div class="floating-tag tag2">
+            Interactive Web
+          </div>
+
+          <div class="floating-tag tag3">
+            Three.js
+          </div>
+
+          <div class="floating-tag tag4">
+            Motion Design
+          </div>
+
+          <div class="orbital">
+
+            <div class="core"></div>
+
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="orbit orbit-three"></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+
+      <div class="container">
+
+        <div class="contact-small reveal">
+          Ready to build something that performs?
+        </div>
+
+        <h2 class="reveal">
+          TURN STRATEGY
+          <span>INTO EXECUTION</span>
+          THAT MOVES.
+        </h2>
+
+        <a
+          href="mailto:hello@example.com"
+          class="contact-button magnetic"
+        >
+          START<br>PROJECT ↗
+        </a>
+
+        <footer>
+
+          <div>
+            © 2026 Syed Meesam Abbas
+          </div>
+
+          <div class="socials">
+            <a href="#">Instagram</a>
+            <a href="#">LinkedIn</a>
+            <a href="#">Behance</a>
+          </div>
+
+          <div>
+            Pakistan
+          </div>
+
+        </footer>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- THREE.JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+
+  <script>
+
+    /* =========================================
+       LOADER
+    ========================================= */
+
+    window.addEventListener("load", () => {
+
+      setTimeout(() => {
+        document
+          .getElementById("loader")
+          .classList.add("hide");
+      }, 1100);
+
+    });
+
+
+    /* =========================================
+       NAVBAR
+    ========================================= */
+
+    const navbar = document.getElementById("navbar");
+
+    window.addEventListener("scroll", () => {
+
+      if (window.scrollY > 50) {
+        navbar.classList.add("scrolled");
+      } else {
+        navbar.classList.remove("scrolled");
+      }
+
+    });
+
+
+    /* =========================================
+       CURSOR
+    ========================================= */
+
+    const cursor = document.querySelector(".cursor");
+    const cursorDot = document.querySelector(".cursor-dot");
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    let cursorX = 0;
+    let cursorY = 0;
+
+    document.addEventListener("mousemove", (e) => {
+
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      cursorDot.style.left = mouseX + "px";
+      cursorDot.style.top = mouseY + "px";
+
+    });
+
+    function animateCursor() {
+
+      cursorX += (mouseX - cursorX) * 0.12;
+      cursorY += (mouseY - cursorY) * 0.12;
+
+      cursor.style.left = cursorX + "px";
+      cursor.style.top = cursorY + "px";
+
+      requestAnimationFrame(animateCursor);
+
+    }
+
+    animateCursor();
+
+
+    /* =========================================
+       SCROLL REVEAL
+    ========================================= */
+
+    const reveals = document.querySelectorAll(".reveal");
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+
+        entries.forEach((entry) => {
+
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+
+        });
+
+      },
+      {
+        threshold: 0.15
+      }
+    );
+
+    reveals.forEach((element) => {
+      revealObserver.observe(element);
+    });
+
+
+    /* =========================================
+       PROJECT 3D TILT
+    ========================================= */
+
+    document.querySelectorAll(".tilt").forEach((card) => {
+
+      card.addEventListener("mousemove", (e) => {
+
+        const rect = card.getBoundingClientRect();
+
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX =
+          ((y - centerY) / centerY) * -7;
+
+        const rotateY =
+          ((x - centerX) / centerX) * 7;
+
+        card.style.transform =
+          `perspective(1000px)
+           rotateX(${rotateX}deg)
+           rotateY(${rotateY}deg)
+           scale3d(1.02,1.02,1.02)`;
+
+      });
+
+      card.addEventListener("mouseleave", () => {
+
+        card.style.transform =
+          "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
+
+      });
+
+    });
+
+
+    /* =========================================
+       MAGNETIC BUTTON
+    ========================================= */
+
+    const magnetic = document.querySelector(".magnetic");
+
+    magnetic.addEventListener("mousemove", (e) => {
+
+      const rect = magnetic.getBoundingClientRect();
+
+      const x =
+        e.clientX -
+        rect.left -
+        rect.width / 2;
+
+      const y =
+        e.clientY -
+        rect.top -
+        rect.height / 2;
+
+      magnetic.style.transform =
+        `translate(${x * 0.25}px, ${y * 0.25}px)
+         scale(1.1)`;
+
+    });
+
+    magnetic.addEventListener("mouseleave", () => {
+
+      magnetic.style.transform =
+        "translate(0px,0px) scale(1)";
+
+    });
+
+
+    /* =========================================
+       VIDEO FILTERS
+    ========================================= */
+    const videoFilterButtons = document.querySelectorAll('.video-filter');
+    const videoCards = document.querySelectorAll('.video-showcase-card[data-category]');
+    const videoCount = document.getElementById('videoCount');
+
+    videoFilterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        videoFilterButtons.forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+
+        let visible = 0;
+        videoCards.forEach((card) => {
+          const show = filter === 'all' || card.dataset.category === filter;
+          card.hidden = !show;
+          if (show) visible += 1;
+        });
+
+        if (videoCount) {
+          videoCount.textContent = `Showing ${visible} video${visible === 1 ? '' : 's'}`;
+        }
+      });
+    });
+
+
+    /* =========================================
+       LAZY YOUTUBE VIDEO PLAYER
+    ========================================= */
+    document.querySelectorAll('.js-video').forEach((frame) => {
+      const playVideo = () => {
+        if (frame.dataset.loaded === 'true') return;
+        const videoId = frame.dataset.video;
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+        iframe.title = 'Project video';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        frame.dataset.loaded = 'true';
+        frame.appendChild(iframe);
+      };
+
+      frame.addEventListener('click', playVideo);
+      frame.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          playVideo();
+        }
+      });
+    });
+
+
+    /* =========================================
+       THREE.JS BACKGROUND
+    ========================================= */
+
+    const canvas =
+      document.getElementById("threeCanvas");
+
+    const scene =
+      new THREE.Scene();
+
+    const camera =
+      new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        100
+      );
+
+    camera.position.z = 7;
+
+    const renderer =
+      new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: true
+      });
+
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, 2)
+    );
+
+
+    /* =========================================
+       3D TORUS KNOT
+    ========================================= */
+
+    const geometry =
+      new THREE.TorusKnotGeometry(
+        1.45,
+        0.35,
+        180,
+        32,
+        2,
+        3
+      );
+
+    const material =
+      new THREE.MeshPhysicalMaterial({
+
+        color: 0xff5a00,
+
+        metalness: 0.8,
+        roughness: 0.23,
+
+        transparent: true,
+        opacity: 0.9,
+
+        clearcoat: 1,
+        clearcoatRoughness: 0.1,
+
+        emissive: 0x351000,
+        emissiveIntensity: 1.2
+
+      });
+
+    const knot =
+      new THREE.Mesh(
+        geometry,
+        material
+      );
+
+    knot.position.x = 3.2;
+    knot.position.y = 0.2;
+
+    scene.add(knot);
+
+
+    /* =========================================
+       WIREFRAME OBJECT
+    ========================================= */
+
+    const wireGeometry =
+      new THREE.IcosahedronGeometry(
+        2.2,
+        2
+      );
+
+    const wireMaterial =
+      new THREE.MeshBasicMaterial({
+
+        color: 0xff7a00,
+
+        wireframe: true,
+
+        transparent: true,
+        opacity: 0.08
+
+      });
+
+    const wireSphere =
+      new THREE.Mesh(
+        wireGeometry,
+        wireMaterial
+      );
+
+    wireSphere.position.x = 3.2;
+
+    scene.add(wireSphere);
+
+
+    /* =========================================
+       PARTICLES
+    ========================================= */
+
+    const particlesCount =
+      window.innerWidth < 700
+      ? 900
+      : 2200;
+
+    const particlesGeometry =
+      new THREE.BufferGeometry();
+
+    const positions =
+      new Float32Array(
+        particlesCount * 3
+      );
+
+    for (
+      let i = 0;
+      i < particlesCount * 3;
+      i += 3
+    ) {
+
+      positions[i] =
+        (Math.random() - 0.5) * 18;
+
+      positions[i + 1] =
+        (Math.random() - 0.5) * 12;
+
+      positions[i + 2] =
+        (Math.random() - 0.5) * 12;
+
+    }
+
+    particlesGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(
+        positions,
+        3
+      )
+    );
+
+    const particlesMaterial =
+      new THREE.PointsMaterial({
+
+        color: 0xff8a35,
+
+        size: 0.018,
+
+        transparent: true,
+
+        opacity: 0.55
+
+      });
+
+    const particles =
+      new THREE.Points(
+        particlesGeometry,
+        particlesMaterial
+      );
+
+    scene.add(particles);
+
+
+    /* =========================================
+       FLOATING SMALL SPHERES
+    ========================================= */
+
+    const miniObjects = [];
+
+    for (let i = 0; i < 16; i++) {
+
+      const miniGeometry =
+        new THREE.SphereGeometry(
+          Math.random() * 0.06 + 0.025,
+          12,
+          12
+        );
+
+      const miniMaterial =
+        new THREE.MeshStandardMaterial({
+
+          color:
+            Math.random() > 0.4
+            ? 0xff6100
+            : 0xffffff,
+
+          emissive: 0xff3100,
+
+          emissiveIntensity: 0.5
+
+        });
+
+      const mini =
+        new THREE.Mesh(
+          miniGeometry,
+          miniMaterial
+        );
+
+      mini.position.set(
+
+        (Math.random() - 0.5) * 10,
+
+        (Math.random() - 0.5) * 7,
+
+        (Math.random() - 0.5) * 5
+
+      );
+
+      mini.userData.speed =
+        Math.random() * 0.01 + 0.003;
+
+      mini.userData.offset =
+        Math.random() * 10;
+
+      miniObjects.push(mini);
+
+      scene.add(mini);
+
+    }
+
+
+    /* =========================================
+       LIGHTS
+    ========================================= */
+
+    const ambientLight =
+      new THREE.AmbientLight(
+        0xffffff,
+        0.8
+      );
+
+    scene.add(ambientLight);
+
+
+    const orangeLight =
+      new THREE.PointLight(
+        0xff4500,
+        18,
+        20
+      );
+
+    orangeLight.position.set(
+      3,
+      2,
+      4
+    );
+
+    scene.add(orangeLight);
+
+
+    const whiteLight =
+      new THREE.PointLight(
+        0xffffff,
+        8,
+        15
+      );
+
+    whiteLight.position.set(
+      -4,
+      -2,
+      3
+    );
+
+    scene.add(whiteLight);
+
+
+    /* =========================================
+       MOUSE PARALLAX
+    ========================================= */
+
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+
+    document.addEventListener(
+      "mousemove",
+      (event) => {
+
+        targetMouseX =
+          (event.clientX / window.innerWidth)
+          * 2 - 1;
+
+        targetMouseY =
+          -(event.clientY / window.innerHeight)
+          * 2 + 1;
+
+      }
+    );
+
+
+    /* =========================================
+       ANIMATION LOOP
+    ========================================= */
+
+    const clock =
+      new THREE.Clock();
+
+    function animate3D() {
+
+      requestAnimationFrame(
+        animate3D
+      );
+
+      const elapsed =
+        clock.getElapsedTime();
+
+
+      /* Main Object */
+
+      knot.rotation.x =
+        elapsed * 0.16;
+
+      knot.rotation.y =
+        elapsed * 0.22;
+
+      knot.rotation.z =
+        Math.sin(elapsed * 0.3) * 0.3;
+
+
+      /* Wire sphere */
+
+      wireSphere.rotation.x =
+        -elapsed * 0.04;
+
+      wireSphere.rotation.y =
+        elapsed * 0.07;
+
+
+      /* Particle movement */
+
+      particles.rotation.y =
+        elapsed * 0.012;
+
+      particles.rotation.x =
+        Math.sin(elapsed * 0.1) * 0.05;
+
+
+      /* Mouse interaction */
+
+      knot.rotation.y +=
+        targetMouseX * 0.25;
+
+      knot.rotation.x +=
+        targetMouseY * 0.15;
+
+
+      camera.position.x +=
+        (
+          targetMouseX * 0.28 -
+          camera.position.x
+        ) * 0.025;
+
+      camera.position.y +=
+        (
+          targetMouseY * 0.22 -
+          camera.position.y
+        ) * 0.025;
+
+
+      /* Scroll Interaction */
+
+      const scroll =
+        window.scrollY;
+
+      knot.position.y =
+        0.2 + scroll * 0.0004;
+
+      knot.rotation.z +=
+        scroll * 0.00002;
+
+
+      /* Mini spheres */
+
+      miniObjects.forEach(
+        (object, index) => {
+
+          object.position.y +=
+            Math.sin(
+              elapsed +
+              object.userData.offset
+            )
+            * object.userData.speed;
+
+          object.rotation.x +=
+            0.01;
+
+          object.rotation.y +=
+            0.008;
+
+        }
+      );
+
+
+      renderer.render(
+        scene,
+        camera
+      );
+
+    }
+
+    animate3D();
+
+
+    /* =========================================
+       RESIZE
+    ========================================= */
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        camera.aspect =
+          window.innerWidth /
+          window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+          window.innerWidth,
+          window.innerHeight
+        );
+
+        renderer.setPixelRatio(
+          Math.min(
+            window.devicePixelRatio,
+            2
+          )
+        );
+
+      }
+    );
+
+
+    /* =========================================
+       HERO TEXT PARALLAX
+    ========================================= */
+
+    const heroTitle =
+      document.querySelector(".hero-title");
+
+    window.addEventListener(
+      "scroll",
+      () => {
+
+        const scroll =
+          window.scrollY;
+
+        if (scroll < window.innerHeight) {
+
+          heroTitle.style.transform =
+            `translateY(${scroll * 0.12}px)`;
+
+          heroTitle.style.opacity =
+            1 - scroll /
+            (window.innerHeight * 1.1);
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
